@@ -1,0 +1,71 @@
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace SimplePaintApp
+{
+    public partial class MainForm : Form
+    {
+        private bool isDrawing = false;
+        private Point lastPoint;
+        private Color currentColor = Color.Black;
+        private int brushSize = 5;
+
+        public MainForm()
+        {
+            InitializeComponent();
+            canvasPictureBox.Image = new Bitmap(canvasPictureBox.Width, canvasPictureBox.Height);
+        }
+
+        private void canvasPictureBox_MouseDown(object sender, MouseEventArgs e)
+        {
+            isDrawing = true;
+            lastPoint = e.Location;
+        }
+
+        private void canvasPictureBox_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isDrawing)
+            {
+                using (Graphics g = Graphics.FromImage(canvasPictureBox.Image))
+                {
+                    using (Pen pen = new Pen(currentColor, brushSize))
+                    {
+                        g.DrawLine(pen, lastPoint, e.Location);
+                        lastPoint = e.Location;
+                    }
+                }
+
+                canvasPictureBox.Refresh();
+            }
+        }
+
+        private void canvasPictureBox_MouseUp(object sender, MouseEventArgs e)
+        {
+            isDrawing = false;
+        }
+
+        private void colorButton_Click(object sender, EventArgs e)
+        {
+            ColorDialog colorDialog = new ColorDialog();
+            if (colorDialog.ShowDialog() == DialogResult.OK)
+            {
+                currentColor = colorDialog.Color;
+            }
+        }
+
+        private void brushSizeTrackBar_Scroll(object sender, EventArgs e)
+        {
+            brushSize = brushSizeTrackBar.Value;
+        }
+
+        private void clearButton_Click(object sender, EventArgs e)
+        {
+            using (Graphics g = Graphics.FromImage(canvasPictureBox.Image))
+            {
+                g.Clear(Color.White);
+            }
+            canvasPictureBox.Refresh();
+        }
+    }
+}
